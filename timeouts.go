@@ -18,6 +18,11 @@ func (to *Timeout) SetTimeout(handle string, duration time.Duration){
 	to.timeouts[handle] = time.Now().UTC().Add(duration);
 }
 func (to *Timeout) InTimeout(handle string) bool{
+	now := time.Now().UTC();
+
 	timeout, ok := to.timeouts[handle];
-	return !ok || time.Now().UTC().After(timeout);
+	return ok && (now.Equal(timeout) || now.Before(timeout));
+}
+func (to *Timeout) RemoveTimeout(handle string){
+	delete(to.timeouts, handle);
 }

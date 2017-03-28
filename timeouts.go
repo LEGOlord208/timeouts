@@ -17,9 +17,15 @@ func NewTimeout() Timeout{
 	};
 }
 
-// Sets a timeout for 'handle' for 'duration'.
+// Sets a timeout for 'handle' with 'duration'.
 func (to *Timeout) SetTimeout(handle string, duration time.Duration){
-	to.timeouts[handle] = time.Now().UTC().Add(duration);
+	now := time.Now().UTC();
+	to.SetTimeoutAt(handle, now.Add(duration));
+}
+
+// Sets a timeout for 'handle' at 'time'
+func (to *Timeout) SetTimeoutAt(handle string, at time.Time){
+	to.timeouts[handle] = at;
 }
 
 // Checks if 'handle' is (still) in a timeout.
@@ -41,19 +47,17 @@ func (to *Timeout) RemoveTimeout(handle string){
 	delete(to.timeouts, handle);
 }
 
-// List handles in timeout.
-// Also removes unnecessary handles.
-// No order guaranteed.
-func (to *Timeout) ListTimeouts() []string{
-	now := time.Now().UTC();
+// Return a copy of timeouts.
+// No guarantee on order, or even if they're passed or not.
+// Should nearly always be used together with PruneTimeouts().
+func (to *Timeout) Timeouts() map[string]time.Time{
+	to.PruneTimeouts();
 
-	var handles []string;
-	for handle, timeout := range to.timeouts{
-		if(now.Before(timeout) || now.Equal(timeout)){
-			handles = append(handles, handle);
-		}
+	copy := make(map[string]time.Time, len(to.timeouts));
+	for key, val := range to.timeouts{
+		copy[key] = val;
 	}
-	return handles;
+	return copy;
 }
 
 // Prune passed timeouts.

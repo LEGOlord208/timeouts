@@ -19,7 +19,7 @@ func NewTimeout() Timeout {
 
 // Sets a timeout for 'handle' with 'duration'.
 func (to *Timeout) SetTimeout(handle string, duration time.Duration) {
-	now := time.Now().UTC()
+	now := time.Now()
 	to.SetTimeoutAt(handle, now.Add(duration))
 }
 
@@ -31,7 +31,7 @@ func (to *Timeout) SetTimeoutAt(handle string, at time.Time) {
 // Checks if 'handle' is (still) in a timeout.
 // Also removes the handle from the timeout to save resources.
 func (to *Timeout) InTimeout(handle string) bool {
-	now := time.Now().UTC()
+	now := time.Now()
 
 	timeout, ok := to.timeouts[handle]
 	val := ok && (now.Before(timeout) || now.Equal(timeout))
@@ -63,7 +63,7 @@ func (to *Timeout) Timeouts() map[string]time.Time {
 // Prune passed timeouts.
 // Return removed handles.
 func (to *Timeout) PruneTimeouts() []string {
-	now := time.Now().UTC()
+	now := time.Now()
 
 	var handles []string
 	for handle, timeout := range to.timeouts {

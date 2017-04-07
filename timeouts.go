@@ -36,7 +36,7 @@ func (to *Timeout) InTimeout(handle string) bool {
 	timeout, ok := to.timeouts[handle]
 	val := ok && (now.Before(timeout) || now.Equal(timeout))
 
-	if val {
+	if !val {
 		to.RemoveTimeout(handle)
 	}
 	return val

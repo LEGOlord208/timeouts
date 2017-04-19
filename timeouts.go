@@ -4,31 +4,31 @@ import (
 	"time"
 )
 
-// A timeout object.
-// Please use the NewTimeout() function.
+// Timeout is a timeout object.
+// Use the NewTimeout() function.
 type Timeout struct {
 	timeouts map[string]time.Time
 }
 
-// Creates a new timeout object.
+// NewTimeout creates a new timeout object.
 func NewTimeout() Timeout {
 	return Timeout{
 		timeouts: make(map[string]time.Time),
 	}
 }
 
-// Sets a timeout for 'handle' with 'duration'.
+// SetTimeout sets a timeout for 'handle' with 'duration'.
 func (to *Timeout) SetTimeout(handle string, duration time.Duration) {
 	now := time.Now()
 	to.SetTimeoutAt(handle, now.Add(duration))
 }
 
-// Sets a timeout for 'handle' at 'time'
+// SetTimeoutAt sets a timeout for 'handle' at 'time'
 func (to *Timeout) SetTimeoutAt(handle string, at time.Time) {
 	to.timeouts[handle] = at
 }
 
-// Checks if 'handle' is (still) in a timeout.
+// InTimeout checks if 'handle' is (still) in a timeout.
 // Also removes the handle from the timeout to save resources.
 func (to *Timeout) InTimeout(handle string) bool {
 	now := time.Now()
@@ -42,12 +42,12 @@ func (to *Timeout) InTimeout(handle string) bool {
 	return val
 }
 
-// Forcefully remove 'handle' from a timeout, if any.
+// RemoveTimeout forcefully removes 'handle' from a timeout, if any.
 func (to *Timeout) RemoveTimeout(handle string) {
 	delete(to.timeouts, handle)
 }
 
-// Return a copy of timeouts.
+// Timeouts returns a copy of timeouts.
 // No guarantee on order, or even if they're passed or not.
 // Should nearly always be used together with PruneTimeouts().
 func (to *Timeout) Timeouts() map[string]time.Time {
@@ -60,8 +60,8 @@ func (to *Timeout) Timeouts() map[string]time.Time {
 	return copy
 }
 
-// Prune passed timeouts.
-// Return removed handles.
+// PruneTimeouts removes passed timeouts.
+// Returns removed handles.
 func (to *Timeout) PruneTimeouts() []string {
 	now := time.Now()
 

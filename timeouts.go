@@ -1,6 +1,7 @@
 package timeouts
 
 import (
+	"sync"
 	"time"
 )
 
@@ -8,6 +9,7 @@ import (
 // Use the NewTimeout() function.
 type Timeout struct {
 	timeouts map[string]time.Time
+	mutex    sync.RWMutex
 }
 
 // NewTimeout creates a new timeout object.
@@ -25,7 +27,9 @@ func (to *Timeout) SetTimeout(handle string, duration time.Duration) {
 
 // SetTimeoutAt sets a timeout for 'handle' at 'time'
 func (to *Timeout) SetTimeoutAt(handle string, at time.Time) {
+	to.mutex.Lock()
 	to.timeouts[handle] = at
+	to.mutex.Unlock()
 }
 
 // InTimeout checks if 'handle' is (still) in a timeout.
@@ -33,7 +37,9 @@ func (to *Timeout) SetTimeoutAt(handle string, at time.Time) {
 func (to *Timeout) InTimeout(handle string) bool {
 	now := time.Now()
 
+	to.mutex.RLock()
 	timeout, ok := to.timeouts[handle]
+	to.mutex.RUnlock()
 	val := ok && (now.Before(timeout) || now.Equal(timeout))
 
 	if !val {
@@ -44,7 +50,9 @@ func (to *Timeout) InTimeout(handle string) bool {
 
 // RemoveTimeout forcefully removes 'handle' from a timeout, if any.
 func (to *Timeout) RemoveTimeout(handle string) {
+	to.mutex.Lock()
 	delete(to.timeouts, handle)
+	to.mutex.Unlock()
 }
 
 // Timeouts returns a copy of timeouts.

@@ -10,7 +10,7 @@ package main;
 
 import (
 	"fmt"
-	"github.com/legolord208/timeouts"
+	"github.com/jD91mZM2/timeouts"
 	"time"
 )
 
